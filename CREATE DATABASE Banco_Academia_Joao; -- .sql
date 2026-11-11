@@ -158,3 +158,161 @@ WHERE TURMA IN ('2INFO-A', '2INFO-B'); -- OU SEJA, SELECIONE OS NOMES E TURMAS D
 SELECT Nome, Email 
 FROM Alunos 
 WHERE Email LIKE '%@escola.com'; -- OU SEJA, SELECIONE OS NOMES E OS EMAIL DOS ALUNOS ONDE O EMAIL TERMINA COM '%@escola.com'
+
+
+-- ATUALIZANDO DADOS COM UPDATE
+-- UPDATE: Atualiza os dados de uma tabela. An sintaxe basica é: UPDATE nome_da_tabela SET nome_da_coluna = novo_valor WHERE condicão;\
+
+--CORRIGIR A TURMA DE UM ALUNO ESPECIFICO 
+UPDATE Alunos 
+SET Turma = `2INFO-C`
+WHERE IdAluno = 3; --Altera a turma do aluno com IdAluno igual a 3 para `2INFO-B`
+
+select * from Alunos;
+select * from Matriculas;
+-- CONFERIR A ALTERAÇÃO DA TURMA DO ALUNO 3 
+SELECT *
+FROM Matriculas
+WHERE IdAluno = 2 AND IdCurso = 3;
+
+
+
+
+select * from Alunos; 
+
+--DESATIVAR ALUNOS DA TURMA 2INFO-B 
+UPDATE Alunos
+SET Ativos = 0
+WHERE Turma = '2INFO-B'--Altera o status de ativo para 0 (inativo) para todos os alunos daturma `2INFO-B``
+
+select * from Alunos; 
+
+-- REATIVAR ALUNOS DA TURMA `2INFO-B'
+UPDATE Alunos 
+SET Ativo = 1 
+WHERE Turma = '2INFO-B'; --Altera o status de ativo para 1 (ativo) para todos os alunos da turma '2INFO-B''
+
+--EXCLUINDO REGISTROS COM DELETE 
+-- DELETE: Exclui regidstros de uma tabela. A sintaxe básica é: DELETE FROM nome_da_tabela WHERE condição;
+
+    INSERT INTO Alunos (Nome, Email, Turma, DataNascimento)
+    VALUES ('Aluno de Teste','teste.remover@escola.com', '2INFO-A', '2008-01-01'); -- Insere um aluno de teste para ser removido posteriormente 
+
+    SELECT * FROM Alunos 
+    WHERE Email = 'teste.remover@escola.com'; --Seleciona o aluno de teste para verificar se ele foi inserido corretamente 
+
+    SELECT * FROM Alunos 
+
+    DELETE FROM Alunos
+    WHERE Email = 'teste.remover@escola.com'; --Exclui o alunos de teste que foi inserido anteriormente 
+
+    SELECT * FROM Alunos 
+    WHERE Email = 'teste.remover@escola.com'; --Seleciona o aluno de teste para verificar se ele foi inserido corretamente 
+
+    --FUNÇÕES DE TEXTO E DATA 
+
+    SELECT 
+    Nome, 
+    UPPER(Nome) AS NomeEmMaiusculo, --Converte o nome para maiúsculo
+    LOWER(Nome) AS NomeEmMaiusculo, --Converte o nome para maiúsculo
+    LEN(Nome) AS QuantidadeDeCaracteres, --Retorna a quantidade de caracteres do nome 
+    CONCAT(Nome, ' - ', Turma) AS NomeETurma, --Concatena o nome e a turma 
+    FORMAT(DataNascimento, 'dd/MM/yyyy') AS DataNascimentoFormatada, --Formata a data 
+    DATEDIFF(YEAR, DataNascimento, GETDATE()) AS IdadeAproximada --Calcula a idade do aluno
+    FROM Alunos;
+
+
+    select * from Alunos;
+
+    --FUNÇOES DE CALCULO E AGRUPAMENTO 
+    --QUANTIDADE DE ALUNOS CADASTRADOS 
+SELECT COUNT (*) AS QuantidadeDeAlunos
+FROM Alunos; 
+
+--QUANTIDADE DE MATRICULAS QUE JA POSSUEM NOTA FINAL 
+SELECT COUNT(NotaFinal) AS QuantidadeDeMatriculasComNota
+FROM Matriculas; 
+
+--MÉDIA , MAIOR E MENOR NOTA; OBS: DADOS NULOS (null) NÃO SÃO CONSIDERADOS NO CALCULOS 
+SELECT 
+    AVG(NotaFinal) AS MediasDasNotas; --Media das Notas 
+    MAX(NotaFinal) AS MaiorNota, -- Maior Nota 
+    MIN(NotaFinal) AS MenorNota --Menor Nota 
+FROM Matriculas; 
+
+--TROCA NULL POR UM TEXTO PARA EXIBIR O RESULTADO DE FOIRMA MAIS CLARA 
+SELECT 
+    IdMatricula, ISNULL(CONVERT(VARCHAR(10), NotaFinal), 'Sem Nota') AS NotaFinal, StatusMatricula 
+    FROM Matriculas; 
+
+    --GRUPO BY E HAVING: Agrupa os registros por uma ou mais colunas e permite filtrar os grupos com base em uma condição. 
+
+    --QUANTOS ALUNOS ESTÃO MATRICULADOS EM CADA TURMA
+    SELECT Turma, COUNT(*) AS QuantidadeDeAlunos
+    FROM Alunos
+    GROUP BY Turma;
+    ORDER BY QuantidadeDeAlunos DESC; --Ordena o resultado pela quantidade de alunos em ordem decrescente 
+
+    --CURSOS QUE TEM DUAS OU MAIS MATRICULAS 
+    SELECT IdCurso, COUNT(*) AS QuantidadeDeMatriculas
+    FROM Matriculas 
+    GROUP BY IdCurso
+    HAVING COUNT(*) >= 2 --Filtra os cursos que têm duas ou mais matrículas 
+    ORDER BY QuantidadeDeMatriculas DESC; --Ordena o resultado pela quantidade de matricula em ordem decrescente
+
+
+--RELACIONANDO TABELAS COM JOIN: Permite combinar registros de duas ou mais tabelas com base em uma condição de correspondencia 
+
+--INNER JOIN: Retorna apenas os registros que tem correspondencia em ambas as tabelas 
+
+SELECT 
+
+    a.Nome AS NomeDoAluno, 
+    c.NomeCurso AS NomeDoCurso, 
+    m.NotaFinal, 
+    m.StatusMatricula
+FROM Matriculas AS m 
+INNER JOIN Alunos AS a
+ON m.IdCurso = a.IdAluno -- RELACIONA A TABELA DE MATRICULAS COM A TABELA DE ALUNOS 
+INNER JOIN Cursos AS CASE WHEN  
+    ON m.IdCurso = c.IdCurso --RELACIONA A TABELA DE MATRICULAS COM A TABELA DE CURSOS
+
+ORDER BY a.Nome; --Ordena o resultado pelo nome do aluno 
+
+--JOIN COM 4 TABELAS: Retorna apenas os registros que tem correspondência em todas as tabelas.
+SELECT 
+    a.Nome AS Aluno 
+    a.Turma, 
+    c.NomeCurso AS Curso, 
+    p.nome As professor,
+    m.NotaFinal, 
+    m.StatusMatricula
+FROM Matriculas AS m 
+INNER JOIN Alunos AS a 
+    ON m.IdAluno = a.IdAluno --Relaciona a tabela Matricula com a tabela Alunos 
+INNER JOIN Cursos AS c 
+    ON m.Curso = c.IdCurso --Relaciona a tabela m,atriculas com a tabela cursos 
+INNER JOIN Professores AS p  
+    ON c.IdProfessor = p.IdProfessor -- Relaciona a tabela cursos com a tabela professores 
+ORDER BY p.Nome ,c.NomeCurso, a.Nome; --Ordena o resultado pelo nome do aluno 
+
+--LEFT JOIN: Retorna todos os registros da tabela à esquerda e os registros correspondentes da tabela à direita. Se não houver correnspondência, os valores da tabela à direita serão nulos. 
+
+SELECT 
+    a.Nome AS NomeDoAluno,
+    c.NomeCurso AS NomeDoCurso,
+    m.NotaFinal, 
+    m.StatusMatricula
+    FROM Alunos AS a    
+LEFT JOIN Matriculas AS m 
+    ON a.IdCurso = c.IdCurso --Relaciona a tabela Alunos com a tabela Matriculas 
+LEFT JOIN Curso AS c 
+    ON m.IdCurso = c.IdCurso --Relaciona a tabela Matriculas com a tabela Cursos
+WHERE m.IdMatricula IS NULL --Filtra os alunos que não possuem matrícula
+
+--SE A CONSULTA NÃO RETORNAR LINHAS, SIGNIFICA QUE TODOS OIS ALUNOS POSSUEM MATRICULA EM APENAS UM CURSO 
+
+--JOIN COM FILTRO E MÉDIA POR CURSO: Retorna a média das notas finais por curso, considerando apenas os alunos possuem matrícula.
+SELECT 
+    c.nomeCurso AS Curso,
+    COUNT(m.IdMatricula)
